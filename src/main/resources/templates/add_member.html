@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::section}, 'Register New Member')}">
+<section>
+  <div class="form-card">
+    <h2>👤 Register New Member</h2>
+    <form method="POST" th:action="@{/add_member}">
+      <input type="hidden" th:name="${csrf.parameterName}" th:value="${csrf.token}">
+      <div class="form-row">
+        <div class="form-group"><label for="name">Full Name *</label><input id="name" type="text" name="name" placeholder="e.g. Rahul Sharma" required autofocus></div>
+        <div class="form-group"><label for="roll_number">Roll Number *</label><input id="roll_number" type="text" name="roll_number" placeholder="e.g. CS2024001" required></div>
+      </div>
+      <div class="form-group"><label for="department">Department *</label><select id="department" name="department" required><option value="">Select department…</option><option th:each="dept : ${departments}" th:value="${dept}" th:text="${dept}"></option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label for="email">Email</label><input id="email" type="email" name="email" placeholder="student@college.edu"></div>
+        <div class="form-group"><label for="phone">Phone Number</label><input id="phone" type="text" name="phone" placeholder="10-digit number"></div>
+      </div>
+      <div class="form-group"><label for="address">Address</label><input id="address" type="text" name="address" placeholder="Hostel / Home address"></div>
+      <div class="form-group"><label for="password">Optional Student Portal Password</label><input id="password" type="password" name="password" minlength="12" autocomplete="new-password"><small class="form-hint">Leave blank to issue a one-time activation code. If you set a password, use at least 12 characters.</small></div>
+      <div style="display:flex; gap:12px; margin-top:8px;"><button type="submit" class="btn btn-primary" style="flex:1;">✅ Register Member</button><a th:href="@{/view_members}" class="btn btn-secondary" style="flex:1; justify-content:center;">Cancel</a></div>
+    </form>
+  </div>
+</section>
+</html>

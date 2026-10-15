@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::section}, 'Add New Book')}">
+<section>
+  <div class="form-card">
+    <h2>➕ Add a New Book</h2>
+    <form method="POST" th:action="@{/add_book}">
+      <input type="hidden" th:name="${csrf.parameterName}" th:value="${csrf.token}">
+      <div class="form-group"><label for="title">Book Title *</label><input id="title" type="text" name="title" placeholder="e.g. Introduction to Algorithms" required autofocus></div>
+      <div class="form-group"><label for="author">Author(s) *</label><input id="author" type="text" name="author" placeholder="e.g. Cormen, Leiserson, Rivest" required></div>
+      <div class="form-group"><label for="category">Category / Department *</label><select id="category" name="category" required><option value="">Select category…</option><option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}"></option></select></div>
+      <div class="form-group"><label for="quantity">Number of Copies *</label><input id="quantity" type="number" name="quantity" min="1" value="1" required></div>
+      <div style="display:flex; gap:12px; margin-top:8px;"><button type="submit" class="btn btn-primary" style="flex:1;">📚 Add Book</button><a th:href="@{/view_books}" class="btn btn-secondary" style="flex:1; justify-content:center;">Cancel</a></div>
+    </form>
+    <p style="margin-top:14px; font-size:0.82rem; color:#94a3b8;">💡 If a book with the same title and author already exists, its quantity will be increased.</p>
+  </div>
+</section>
+</html>

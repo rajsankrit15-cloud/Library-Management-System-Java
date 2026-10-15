@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::section}, 'Student Monitoring')}">
+<section>
+  <div class="section-heading">
+    <div><h2>🎓 Student Monitoring</h2><p>Review portal registration, current loans, and fine estimates for all library members.</p></div>
+  </div>
+  <div class="stats-grid monitoring-grid">
+    <div class="stat-card"><div class="stat-icon icon-blue">🎓</div><div class="stat-info"><h3 th:text="${monitoring.totalStudentAccounts}">0</h3><p>Registered Portal Accounts</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-yellow">📝</div><div class="stat-info"><h3 th:text="${monitoring.unregisteredStudents}">0</h3><p>Not Yet Registered</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-green">📖</div><div class="stat-info"><h3 th:text="${monitoring.studentActiveLoans}">0</h3><p>Active Student Loans</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-red">⚠️</div><div class="stat-info"><h3 th:text="${monitoring.studentOverdueLoans}">0</h3><p>Overdue Student Loans</p></div></div>
+  </div>
+  <div class="table-container">
+    <div class="table-toolbar">
+      <div><h2>All student records</h2><p class="toolbar-subtitle">Loan and fine details are available for each student.</p></div>
+      <form class="search-form" method="GET" th:action="@{/admin/students}">
+        <div class="input-group"><input type="text" name="q" th:value="${query}" placeholder="Search name, roll no., email…"><button type="submit">🔍</button></div>
+        <a th:if="${query != ''}" th:href="@{/admin/students}" class="btn btn-secondary btn-sm">✕ Clear</a>
+      </form>
+    </div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Student</th><th>Roll No.</th><th>Department</th><th>Email</th><th>Portal</th><th>Active Loans</th><th>Current Fines</th><th>Joined</th><th>Details</th></tr></thead>
+      <tbody>
+        <tr th:each="student : ${students}">
+          <td><strong th:text="${student.name}"></strong></td>
+          <td><span class="badge badge-secondary" th:text="${student.roll_number}"></span></td>
+          <td th:text="${student.department}"></td><td th:text="${student.email ?: '—'}"></td>
+          <td><span th:if="${student.registered == 1}" class="badge badge-success">Registered</span><span th:unless="${student.registered == 1}" class="badge badge-warning">Not registered</span></td>
+          <td th:text="${student.active_loans}"></td><td th:text="'₹' + ${student.fines}"></td><td th:text="${student.join_date}"></td>
+          <td><a th:href="@{/admin/students/{id}(id=${student.id})}" class="btn btn-secondary btn-sm">View records</a></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(students)}"><td colspan="9"><div class="empty-state"><div class="empty-icon">🎓</div><p>No student records match this search.</p></div></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+</html>

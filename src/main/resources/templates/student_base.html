@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(content, pageTitle)">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><th:block th:text="${pageTitle}">Student Portal</th:block> — College Library</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🎓</div>
+      <h2>Student Portal</h2>
+      <p>College Library System</p>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">My Library</div>
+      <a th:href="@{/student/dashboard}" th:classappend="${requestUri == '/student/dashboard' or requestUri == '/student'} ? ' active' : ''"><span class="nav-icon">🏠</span> My Dashboard</a>
+      <a th:href="@{/student/loans}" th:classappend="${requestUri == '/student/loans'} ? ' active' : ''"><span class="nav-icon">📋</span> My Loans & Fines</a>
+      <div class="nav-section-label">Discover</div>
+      <a th:href="@{/student/books}" th:classappend="${requestUri == '/student/books'} ? ' active' : ''"><span class="nav-icon">📚</span> Browse Books</a>
+    </div>
+    <div class="sidebar-footer">
+      <form method="POST" th:action="@{/student/logout}">
+        <input type="hidden" th:name="${csrf.parameterName}" th:value="${csrf.token}">
+        <button type="submit" class="btn btn-secondary">🚪 Sign Out</button>
+      </form>
+    </div>
+  </nav>
+  <div class="main-content">
+    <div class="topbar">
+      <h1 th:text="${pageTitle}">My Dashboard</h1>
+      <div class="topbar-right">🎓 <span class="badge-admin" th:text="${session.username ?: 'Student'}">Student</span></div>
+    </div>
+    <div class="page-content">
+      <div class="flash-container" th:if="${message}">
+        <div th:class="'alert alert-' + ${messageType ?: 'info'}">
+          <span th:text="${messageType == 'success' ? '✅' : (messageType == 'danger' ? '❌' : (messageType == 'warning' ? '⚠️' : 'ℹ️'))}"></span>
+          <span th:text="${message}"></span>
+        </div>
+      </div>
+      <th:block th:replace="${content}"></th:block>
+    </div>
+  </div>
+</body>
+</html>

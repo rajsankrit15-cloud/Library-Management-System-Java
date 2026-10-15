@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{student_base :: layout(~{::section}, 'Browse Books')}">
+<section>
+  <div class="table-container">
+    <div class="table-toolbar">
+      <div><h2>📚 Library Catalog</h2><p class="toolbar-subtitle">Browse titles and check how many copies are available.</p></div>
+      <form class="search-form" method="GET" th:action="@{/student/books}">
+        <div class="input-group"><input type="text" name="q" th:value="${query}" placeholder="Search title, author…"><button type="submit">🔍</button></div>
+        <select name="category" class="filter-select" onchange="this.form.submit()">
+          <option value="">All Categories</option>
+          <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}" th:selected="${cat == categoryFilter}"></option>
+        </select>
+        <a th:if="${query != '' or categoryFilter != ''}" th:href="@{/student/books}" class="btn btn-secondary btn-sm">✕ Clear</a>
+      </form>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Available Copies</th><th>Availability</th></tr></thead>
+        <tbody>
+          <tr th:each="book : ${books}">
+            <td><strong th:text="${book.title}">Title</strong><div class="table-secondary" th:text="${book.id}">ID</div></td>
+            <td th:text="${book.author}">Author</td><td><span class="badge badge-primary" th:text="${book.category}">Category</span></td>
+            <td th:text="${book.quantity}">0</td>
+            <td><span th:if="${book.quantity == 0}" class="badge badge-danger">Currently unavailable</span><span th:if="${book.quantity > 0 and book.quantity <= 2}" class="badge badge-warning">Limited copies</span><span th:if="${book.quantity > 2}" class="badge badge-success">Available</span></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(books)}"><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><p>No books match your search.</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</html>

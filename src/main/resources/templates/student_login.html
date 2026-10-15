@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Sign In — College Library System</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🎓</div>
+      <h1>Student Library Portal</h1>
+      <p>View your profile, loans, and the library catalog</p>
+    </div>
+    <div th:if="${message}" th:class="'alert alert-' + ${messageType ?: 'info'}" style="margin-bottom:16px;">
+      <span th:text="${message}"></span>
+    </div>
+    <form method="POST" th:action="@{/student/login}">
+      <input type="hidden" th:name="${csrf.parameterName}" th:value="${csrf.token}">
+      <div class="form-group">
+        <label for="roll_number">Roll Number</label>
+        <input id="roll_number" type="text" name="roll_number" placeholder="Enter your roll number" required autofocus>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" placeholder="Enter your password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:8px;">🎓 Sign In</button>
+    </form>
+    <p style="text-align:center; margin-top:20px; font-size:0.85rem; color:#64748b;">
+      First time here? Ask your librarian for a one-time registration code.
+    </p>
+    <p style="text-align:center; margin-top:12px;"><a th:href="@{/student/register}">Create student account →</a></p>
+    <p style="text-align:center; margin-top:14px;"><a th:href="@{/login}">Librarian sign in →</a></p>
+  </div>
+</body>
+</html>

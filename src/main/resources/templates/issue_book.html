@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::section}, 'Issue a Book')}">
+<section>
+  <div class="form-card">
+    <h2>📤 Issue a Book</h2>
+    <div th:if="${message}" th:class="'alert alert-' + ${messageType}" th:text="${message}"></div>
+    <form method="POST" th:action="@{/issue_book}">
+      <input type="hidden" th:name="${csrf.parameterName}" th:value="${csrf.token}">
+      <div class="form-group"><label for="book_id">Select Book *</label><select id="book_id" name="book_id" required><option value="">— Choose a book in stock —</option><option th:each="book : ${books}" th:value="${book.id}" th:text="${book.title + ' by ' + book.author + ' (' + book.quantity + ' left) [' + book.category + ']'}"></option></select></div>
+      <div class="form-group"><label for="member_id">Select Member *</label><select id="member_id" name="member_id" required><option value="">— Choose a member —</option><option th:each="member : ${members}" th:value="${member.id}" th:text="${member.name + ' — ' + member.roll_number + ' (' + member.department + ')'}"></option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label for="issue_date">Issue Date *</label><input id="issue_date" type="date" name="issue_date" th:value="${today}" required></div>
+        <div class="form-group"><label for="issue_time">Issue Time *</label><input id="issue_time" type="time" name="issue_time" th:value="${currentTime}" required></div>
+      </div>
+      <div class="card" style="margin:4px 0 18px; padding:12px 16px; background:#eef2ff; border-color:#c7d2fe;"><p style="font-size:0.82rem; color:#4338ca; margin:0;">📌 <strong>Rules:</strong> Each member can borrow up to 3 books for 15 days. Fine of ₹45/day after due date.</p></div>
+      <div style="display:flex; gap:12px;"><button type="submit" class="btn btn-primary" style="flex:1;">📤 Issue Book</button><a th:href="@{/view_issued_books}" class="btn btn-secondary" style="flex:1; justify-content:center;">Cancel</a></div>
+    </form>
+  </div>
+</section>
+</html>

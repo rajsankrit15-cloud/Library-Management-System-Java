@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::section}, 'Overdue Books')}">
+<section>
+  <div th:if="${!#lists.isEmpty(overdue)}" class="alert alert-danger" style="margin-bottom:20px;">⚠️ <strong th:text="${#lists.size(overdue) + ' book(s)'}"></strong> are currently overdue. Fine: ₹45 per day after 15 days.</div>
+  <div class="table-container">
+    <div class="table-toolbar"><h2>⚠️ Overdue Books</h2><span style="font-size:0.85rem; color:#64748b;">Fine Rate: ₹45 / day</span></div>
+    <table>
+      <thead><tr><th>Book</th><th>Category</th><th>Member</th><th>Roll No.</th><th>Department</th><th>Phone</th><th>Issued</th><th>Due Date</th><th>Days Overdue</th><th>Est. Fine</th></tr></thead>
+      <tbody>
+        <tr th:each="row : ${overdue}" class="overdue-row">
+          <td><strong th:text="${row.title}"></strong></td><td><span class="badge badge-primary" th:text="${row.category}"></span></td>
+          <td th:text="${row.member_name}"></td><td><span class="badge badge-danger" th:text="${row.roll_number}"></span></td>
+          <td th:text="${row.department}"></td><td th:text="${row.phone ?: '—'}"></td>
+          <td th:text="${#strings.substring(row.issued_date,0,10)}"></td><td th:text="${#strings.substring(row.due_date,0,10)}"></td>
+          <td><strong style="color:#dc2626;" th:text="${row.days_overdue + ' days'}"></strong></td>
+          <td><strong style="color:#dc2626;" th:text="'₹' + ${row.days_overdue * 45}"></strong></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(overdue)}"><td colspan="10"><div class="empty-state"><div class="empty-icon">✅</div><p>No overdue books! All issues are within due date.</p></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</html>

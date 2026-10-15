@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::section}, 'Dashboard')}">
+<section>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon icon-blue">📚</div><div class="stat-info"><h3 th:text="${totalTitles}">0</h3><p>Book Titles</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-green">📦</div><div class="stat-info"><h3 th:text="${totalBooks}">0</h3><p>Total Copies</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-purple">👥</div><div class="stat-info"><h3 th:text="${totalMembers}">0</h3><p>Registered Members</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-yellow">📤</div><div class="stat-info"><h3 th:text="${activeIssues}">0</h3><p>Active Issues</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-red">⚠️</div><div class="stat-info"><h3 th:text="${overdueCount}">0</h3><p>Overdue Books</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-orange">💰</div><div class="stat-info"><h3>₹<span th:text="${totalFines}">0</span></h3><p>Fines Collected</p></div></div>
+  </div>
+  <div class="section-heading">
+    <div><h2>Administration overview</h2><p>Monitor library staff and student portal activity.</p></div>
+    <div class="section-actions"><a th:href="@{/admin/accounts}" class="btn btn-secondary btn-sm">Manage admins</a><a th:href="@{/admin/students}" class="btn btn-primary btn-sm">Monitor students</a></div>
+  </div>
+  <div class="stats-grid monitoring-grid">
+    <div class="stat-card"><div class="stat-icon icon-purple">🛡️</div><div class="stat-info"><h3 th:text="${monitoring.totalAdmins}">0</h3><p>Active Admins</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-blue">🎓</div><div class="stat-info"><h3 th:text="${monitoring.totalStudentAccounts}">0</h3><p>Student Portal Accounts</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-yellow">📝</div><div class="stat-info"><h3 th:text="${monitoring.unregisteredStudents}">0</h3><p>Students Not Registered</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-green">📖</div><div class="stat-info"><h3 th:text="${monitoring.studentActiveLoans}">0</h3><p>Student Active Loans</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-red">⚠️</div><div class="stat-info"><h3 th:text="${monitoring.studentOverdueLoans}">0</h3><p>Student Overdue Loans</p></div></div>
+  </div>
+  <div class="table-container monitoring-table">
+    <div class="table-toolbar"><div><h2>🛡️ Admin sign-in activity</h2><p class="toolbar-subtitle">Most recent successful sign-ins for enabled admin accounts.</p></div><a th:href="@{/admin/accounts}" class="btn btn-secondary btn-sm">All admin accounts →</a></div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Username</th><th>Role</th><th>Last Successful Sign-In</th></tr></thead>
+      <tbody>
+        <tr th:each="account : ${recentAdminLogins}"><td><strong th:text="${account.username}"></strong></td><td><span th:class="${account.role == 'MAIN' ? 'badge badge-primary' : 'badge badge-secondary'}" th:text="${account.role == 'MAIN' ? 'Main Admin' : 'Sub-admin'}"></span></td><td th:text="${account.last_login ?: 'Never signed in'}"></td></tr>
+        <tr th:if="${#lists.isEmpty(recentAdminLogins)}"><td colspan="3">No admin accounts found.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="table-container">
+    <div class="table-toolbar"><h2>📋 Recently Issued Books</h2><a th:href="@{/view_issued_books}" class="btn btn-secondary btn-sm">View All →</a></div>
+    <table>
+      <thead><tr><th>Book Title</th><th>Member</th><th>Roll No.</th><th>Issued Date</th><th>Due Date</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr th:each="issue : ${recentIssues}">
+          <td><strong th:text="${issue.title}"></strong></td><td th:text="${issue.name}"></td>
+          <td><span class="badge badge-secondary" th:text="${issue.roll_number}"></span></td>
+          <td th:text="${#strings.substring(issue.issued_date,0,10)}"></td><td th:text="${#strings.substring(issue.due_date,0,10)}"></td>
+          <td><span th:if="${issue.due_date < nowText}" class="badge badge-danger">Overdue</span><span th:unless="${issue.due_date < nowText}" class="badge badge-success">Active</span></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(recentIssues)}"><td colspan="6" style="text-align:center; color:#94a3b8; padding:32px;">No active issues found.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:24px;">
+    <div class="card"><div class="card-body" style="display:flex; flex-direction:column; gap:12px;">
+      <h3 style="font-size:1rem; font-weight:700;">Quick Actions</h3>
+      <a th:href="@{/add_book}" class="btn btn-primary">➕ Add New Book</a><a th:href="@{/add_member}" class="btn btn-success">👤 Register Member</a>
+      <a th:href="@{/issue_book}" class="btn btn-warning">📤 Issue a Book</a><a th:href="@{/return_book}" class="btn btn-secondary">📥 Return a Book</a>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <h3 style="font-size:1rem; font-weight:700; margin-bottom:14px;">Library Rules</h3>
+      <ul style="font-size:0.85rem; color:#64748b; line-height:2; padding-left:20px;">
+        <li>Maximum <strong>3 books</strong> per member at a time</li><li>Return period: <strong>15 days</strong> from issue date</li>
+        <li>Overdue fine: <strong>₹45 per day</strong></li><li>Library hours: <strong>9:00 AM – 8:00 PM</strong>, Mon–Sat</li>
+        <li>Lost/damaged books must be replaced by the member</li>
+      </ul>
+    </div></div>
+  </div>
+</section>
+</html>

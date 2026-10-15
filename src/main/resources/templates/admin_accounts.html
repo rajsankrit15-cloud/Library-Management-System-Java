@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::section}, 'Admin Accounts')}">
+<section>
+  <div class="section-heading">
+    <div><h2>🛡️ Admin Accounts</h2><p>Manage the main admin and sub-admin access to the library system.</p></div>
+    <a th:href="@{/admin/accounts/new}" class="btn btn-primary">➕ Add Sub-admin</a>
+  </div>
+  <div class="stats-grid monitoring-grid">
+    <div class="stat-card"><div class="stat-icon icon-purple">🛡️</div><div class="stat-info"><h3 th:text="${monitoring.totalAdmins}">0</h3><p>Enabled Admin Accounts</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-green">🎓</div><div class="stat-info"><h3 th:text="${monitoring.totalStudentAccounts}">0</h3><p>Student Accounts</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-yellow">📝</div><div class="stat-info"><h3 th:text="${monitoring.unregisteredStudents}">0</h3><p>Students To Register</p></div></div>
+  </div>
+  <div class="table-container">
+    <div class="table-toolbar"><div><h2>Admin access and sign-in activity</h2><p class="toolbar-subtitle">Disabled accounts cannot sign in; existing sessions are revoked on their next request.</p></div></div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Username</th><th>Role</th><th>Status</th><th>Created By</th><th>Sub-admins Added</th><th>Last Sign-In</th><th>Controls</th></tr></thead>
+      <tbody>
+        <tr th:each="account : ${admins}">
+          <td><strong th:text="${account.username}"></strong></td>
+          <td><span th:class="${account.role == 'MAIN' ? 'badge badge-primary' : 'badge badge-secondary'}" th:text="${account.role == 'MAIN' ? 'Main Admin' : 'Sub-admin'}"></span></td>
+          <td><span th:if="${account.enabled == 1}" class="badge badge-success">Enabled</span><span th:unless="${account.enabled == 1}" class="badge badge-danger">Disabled</span></td>
+          <td th:text="${account.created_by ?: 'Initial account'}"></td>
+          <td th:text="${account.admins_created}"></td>
+          <td th:text="${account.last_login ?: 'Never signed in'}"></td>
+          <td>
+            <div th:if="${account.role == 'SUB'}" class="admin-controls">
+              <form method="POST" th:action="@{/admin/accounts/{id}/status(id=${account.id})}">
+                <input type="hidden" th:name="${csrf.parameterName}" th:value="${csrf.token}">
+                <input type="hidden" name="enabled" th:value="${account.enabled == 1 ? 'false' : 'true'}">
+                <button th:if="${account.enabled == 1}" type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Disable this sub-admin?');">Disable</button>
+                <button th:unless="${account.enabled == 1}" type="submit" class="btn btn-success btn-sm">Enable</button>
+              </form>
+              <details class="password-reset">
+                <summary class="btn btn-secondary btn-sm">Reset password</summary>
+                <form method="POST" th:action="@{/admin/accounts/{id}/password(id=${account.id})}" class="reset-form">
+                  <input type="hidden" th:name="${csrf.parameterName}" th:value="${csrf.token}">
+                  <input type="password" name="password" minlength="12" autocomplete="new-password" placeholder="New password (12+ chars)" required>
+                  <input type="password" name="confirm_password" minlength="12" autocomplete="new-password" placeholder="Confirm password" required>
+                  <button type="submit" class="btn btn-primary btn-sm">Save password</button>
+                </form>
+              </details>
+            </div>
+            <span th:if="${account.role == 'MAIN'}" class="table-secondary">Protected main account</span>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(admins)}"><td colspan="7"><div class="empty-state"><div class="empty-icon">🛡️</div><p>No admin accounts found.</p></div></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="admin-note"><strong>Account safety</strong><p>Passwords are stored as secure BCrypt hashes. The initial main-admin account cannot be disabled from this page. Each admin account is tracked with its creator and last successful sign-in.</p></div>
+</section>
+</html>

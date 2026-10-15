@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{student_base :: layout(~{::section}, 'My Loans & Fines')}">
+<section>
+  <div class="table-container">
+    <div class="table-toolbar"><div><h2>🧾 My Loan History</h2><p class="toolbar-subtitle">Late returns are charged at ₹45 per day after the 15-day loan period.</p></div><a th:href="@{/student/books}" class="btn btn-primary btn-sm">Browse Books</a></div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Book</th><th>Issued</th><th>Due Date</th><th>Returned</th><th>Days Overdue</th><th>Fine</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr th:each="loan : ${loans}" th:classappend="${loan.return_date == null and loan.days_overdue > 0} ? ' overdue-row' : ''">
+            <td><strong th:text="${loan.title}">Title</strong><div class="table-secondary" th:text="${loan.author}">Author</div></td>
+            <td th:text="${#strings.substring(loan.issued_date,0,10)}"></td><td th:text="${#strings.substring(loan.due_date,0,10)}"></td>
+            <td th:text="${loan.return_date == null ? 'Not returned' : #strings.substring(loan.return_date,0,10)}"></td>
+            <td th:text="${loan.return_date == null ? loan.days_overdue : '—'}"></td>
+            <td><strong th:if="${loan.estimated_fine > 0}" style="color:#dc2626;" th:text="'₹' + ${loan.estimated_fine}"></strong><span th:unless="${loan.estimated_fine > 0}">₹0</span></td>
+            <td><span th:if="${loan.return_date != null}" class="badge badge-success">Returned</span><span th:if="${loan.return_date == null and loan.days_overdue > 0}" class="badge badge-danger">Overdue</span><span th:if="${loan.return_date == null and loan.days_overdue == 0}" class="badge badge-warning">Borrowed</span></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(loans)}"><td colspan="7"><div class="empty-state"><div class="empty-icon">📖</div><p>You don't have any loan records yet.</p><a th:href="@{/student/books}" class="btn btn-primary" style="margin-top:16px;">Browse the Catalog</a></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</html>

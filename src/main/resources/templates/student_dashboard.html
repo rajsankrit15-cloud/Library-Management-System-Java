@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{student_base :: layout(~{::section}, 'My Dashboard')}">
+<section>
+  <div class="card student-profile-card">
+    <div class="card-body student-profile">
+      <div class="student-avatar">🎓</div>
+      <div>
+        <p class="student-eyebrow">YOUR LIBRARY ACCOUNT</p>
+        <h2 th:text="${member.name}">Student Name</h2>
+        <p><span class="badge badge-primary" th:text="${member.roll_number}">Roll No.</span> <span th:text="${member.department}">Department</span></p>
+        <p class="student-contact"><span th:text="${member.email ?: 'No email on file'}"></span><span th:if="${member.phone}" th:text="' · ' + ${member.phone}"></span></p>
+        <p class="student-contact" th:if="${member.address}" th:text="${member.address}"></p>
+      </div>
+      <div class="student-joined"><span>Member since</span><strong th:text="${member.join_date}">—</strong></div>
+    </div>
+  </div>
+
+  <div class="stats-grid student-stats">
+    <div class="stat-card"><div class="stat-icon icon-blue">📖</div><div class="stat-info"><h3 th:text="${summary.activeLoans}">0</h3><p>Currently Borrowed</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-green">✅</div><div class="stat-info"><h3 th:text="${summary.returnedLoans}">0</h3><p>Books Returned</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-red">⚠️</div><div class="stat-info"><h3 th:text="${summary.overdueLoans}">0</h3><p>Overdue Books</p></div></div>
+    <div class="stat-card"><div class="stat-icon icon-orange">💰</div><div class="stat-info"><h3>₹<span th:text="${summary.totalFines}">0</span></h3><p>Fines & Estimates</p></div></div>
+  </div>
+
+  <div class="table-container">
+    <div class="table-toolbar"><div><h2>📚 My Current Loans</h2><p class="toolbar-subtitle">Return books by the due date to avoid a ₹45/day late fine.</p></div><a th:href="@{/student/loans}" class="btn btn-secondary btn-sm">Full History →</a></div>
+    <div th:if="${#lists.isEmpty(loans.?[return_date == null])}" class="empty-state"><div class="empty-icon">✨</div><p>You have no books checked out right now.</p><a th:href="@{/student/books}" class="btn btn-primary" style="margin-top:16px;">Browse the Catalog</a></div>
+    <div class="table-scroll" th:unless="${#lists.isEmpty(loans.?[return_date == null])}">
+      <table>
+        <thead><tr><th>Book</th><th>Issued</th><th>Due Date</th><th>Status</th><th>Current Fine</th></tr></thead>
+        <tbody>
+          <tr th:each="loan : ${loans}" th:if="${loan.return_date == null}" th:classappend="${loan.days_overdue > 0} ? ' overdue-row' : ''">
+            <td><strong th:text="${loan.title}">Title</strong><div class="table-secondary" th:text="${loan.author}">Author</div></td>
+            <td th:text="${#strings.substring(loan.issued_date,0,10)}"></td><td th:text="${#strings.substring(loan.due_date,0,10)}"></td>
+            <td><span th:if="${loan.days_overdue > 0}" class="badge badge-danger" th:text="${loan.days_overdue + ' days overdue'}"></span><span th:unless="${loan.days_overdue > 0}" class="badge badge-success">On time</span></td>
+            <td><strong th:if="${loan.estimated_fine > 0}" style="color:#dc2626;" th:text="'₹' + ${loan.estimated_fine}"></strong><span th:unless="${loan.estimated_fine > 0}">₹0</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="student-shortcuts">
+    <a th:href="@{/student/books}" class="card shortcut-card"><span>📚</span><strong>Browse available books</strong><small>Search the library catalog</small></a>
+    <a th:href="@{/student/loans}" class="card shortcut-card"><span>🧾</span><strong>View loan history</strong><small>Check returned books and fines</small></a>
+  </div>
+</section>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::section}, 'Student Records')}">
+<section>
+  <div class="section-heading">
+    <div><h2>🎓 <span th:text="${member.name}">Student</span></h2><p>Student portal and complete loan history.</p></div>
+    <a th:href="@{/admin/students}" class="btn btn-secondary">← All students</a>
+  </div>
+  <div class="card student-profile-card">
+    <div class="card-body student-profile">
+      <div class="student-avatar">🎓</div>
+      <div>
+        <p class="student-eyebrow">STUDENT RECORD</p>
+        <h2 th:text="${member.name}">Student Name</h2>
+        <p><span class="badge badge-primary" th:text="${member.roll_number}">Roll No.</span><span th:text="${member.department}">Department</span></p>
+        <p class="student-contact"><span th:text="${member.email ?: 'No email on file'}"></span><span th:if="${member.phone}" th:text="' · ' + ${member.phone}"></span></p>
+      </div>
+      <div class="card" th:if="${member.account_enabled == 0}" style="margin:18px 0; padding:18px;">
+        <h3>Student portal activation</h3>
+        <p>Create a one-time code for this student. Share it only through a verified institutional channel; it expires after 48 hours.</p>
+        <div th:if="${activationCode}" class="alert alert-success">
+          <strong>Show this code once to the student:</strong>
+          <code th:text="${activationCode}" style="overflow-wrap:anywhere;"></code>
+        </div>
+        <form method="POST" th:action="@{/admin/students/{id}/activation(id=${member.id})}">
+          <input type="hidden" th:name="${csrf.parameterName}" th:value="${csrf.token}">
+          <button type="submit" class="btn btn-primary">Generate one-time activation code</button>
+        </form>
+      </div>
+      <div class="student-joined"><span>Member since</span><strong th:text="${member.join_date}"></strong></div>
+    </div>
+  </div>
+  <div class="table-container">
+    <div class="table-toolbar"><div><h2>🧾 Complete Loan History</h2><p class="toolbar-subtitle">Current overdue estimates use ₹45 for each day past the due date.</p></div></div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Book</th><th>Issued</th><th>Due Date</th><th>Returned</th><th>Days Overdue</th><th>Fine</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr th:each="loan : ${loans}" th:classappend="${loan.return_date == null and loan.days_overdue > 0} ? ' overdue-row' : ''">
+          <td><strong th:text="${loan.title}"></strong><div class="table-secondary" th:text="${loan.author}"></div></td>
+          <td th:text="${#strings.substring(loan.issued_date,0,10)}"></td><td th:text="${#strings.substring(loan.due_date,0,10)}"></td>
+          <td th:text="${loan.return_date == null ? 'Not returned' : #strings.substring(loan.return_date,0,10)}"></td>
+          <td th:text="${loan.return_date == null ? loan.days_overdue : '—'}"></td>
+          <td><strong th:if="${loan.estimated_fine > 0}" style="color:#dc2626;" th:text="'₹' + ${loan.estimated_fine}"></strong><span th:unless="${loan.estimated_fine > 0}">₹0</span></td>
+          <td><span th:if="${loan.return_date != null}" class="badge badge-success">Returned</span><span th:if="${loan.return_date == null and loan.days_overdue > 0}" class="badge badge-danger">Overdue</span><span th:if="${loan.return_date == null and loan.days_overdue == 0}" class="badge badge-warning">Borrowed</span></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(loans)}"><td colspan="7"><div class="empty-state"><div class="empty-icon">📖</div><p>This student has no loan records yet.</p></div></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+</html>

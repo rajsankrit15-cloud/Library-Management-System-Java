@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::section}, 'Return a Book')}">
+<section>
+  <div class="form-card">
+    <h2>📥 Return a Book</h2>
+    <div th:if="${message}" th:class="'alert alert-' + ${messageType}" th:text="${message}"></div>
+    <form th:if="${!#lists.isEmpty(activeIssues)}" method="POST" th:action="@{/return_book}">
+      <input type="hidden" th:name="${csrf.parameterName}" th:value="${csrf.token}">
+      <div class="form-group"><label for="issue_id">Select Issued Record *</label><select id="issue_id" name="issue_id" required><option value="">— Choose book to return —</option><option th:each="issue : ${activeIssues}" th:value="${issue.id}" th:text="${issue.title + ' → ' + issue.name + ' (' + issue.roll_number + ') | Due: ' + #strings.substring(issue.due_date,0,10)}"></option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label for="return_date">Return Date *</label><input id="return_date" type="date" name="return_date" th:value="${today}" required></div>
+        <div class="form-group"><label for="return_time">Return Time *</label><input id="return_time" type="time" name="return_time" th:value="${currentTime}" required></div>
+      </div>
+      <div class="card" style="margin:4px 0 18px; padding:12px 16px; background:#fef3c7; border-color:#fde68a;"><p style="font-size:0.82rem; color:#92400e; margin:0;">⚠️ Fine of <strong>₹45/day</strong> will be applied if returned after the due date.</p></div>
+      <div style="display:flex; gap:12px;"><button type="submit" class="btn btn-success" style="flex:1;">📥 Process Return</button><a th:href="@{/view_issued_books}" class="btn btn-secondary" style="flex:1; justify-content:center;">Cancel</a></div>
+    </form>
+    <div th:if="${#lists.isEmpty(activeIssues)}" class="empty-state"><div class="empty-icon">✅</div><p>No books are currently issued. Nothing to return!</p><a th:href="@{/issue_book}" class="btn btn-primary" style="margin-top:16px;">Issue a Book</a></div>
+  </div>
+</section>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::section}, 'Issued Books')}">
+<section>
+  <div class="table-container">
+    <div class="table-toolbar">
+      <h2>📋 Issued Books</h2>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <div class="tab-filters">
+          <a th:href="@{/view_issued_books(status='all',q=${query})}" class="tab-btn" th:classappend="${statusFilter == 'all'} ? ' active' : ''">All</a>
+          <a th:href="@{/view_issued_books(status='active',q=${query})}" class="tab-btn" th:classappend="${statusFilter == 'active'} ? ' active' : ''">Active</a>
+          <a th:href="@{/view_issued_books(status='overdue',q=${query})}" class="tab-btn" th:classappend="${statusFilter == 'overdue'} ? ' active' : ''">⚠️ Overdue</a>
+          <a th:href="@{/view_issued_books(status='returned',q=${query})}" class="tab-btn" th:classappend="${statusFilter == 'returned'} ? ' active' : ''">Returned</a>
+        </div>
+        <form class="search-form" method="GET" th:action="@{/view_issued_books}">
+          <input type="hidden" name="status" th:value="${statusFilter}">
+          <div class="input-group"><input type="text" name="q" th:value="${query}" placeholder="Search title, member…"><button type="submit">🔍</button></div>
+          <a th:if="${query != ''}" th:href="@{/view_issued_books(status=${statusFilter})}" class="btn btn-secondary btn-sm">✕</a>
+        </form>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Book</th><th>Category</th><th>Member</th><th>Roll No.</th><th>Issued</th><th>Due Date</th><th>Return Date</th><th>Days</th><th>Fine</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr th:each="issue : ${issuedBooks}" th:classappend="${issue.return_date == null and issue.due_date < nowText} ? ' overdue-row' : ''">
+          <td><strong th:text="${issue.title}"></strong></td><td><span class="badge badge-primary" th:text="${issue.category}"></span></td>
+          <td th:text="${issue.member_name}"></td><td><span class="badge badge-secondary" th:text="${issue.roll_number}"></span></td>
+          <td th:text="${#strings.substring(issue.issued_date,0,10)}"></td><td th:text="${#strings.substring(issue.due_date,0,10)}"></td>
+          <td th:text="${issue.return_date == null ? '—' : #strings.substring(issue.return_date,0,10)}"></td>
+          <td th:text="${issue.number_of_days == null ? '—' : issue.number_of_days}"></td>
+          <td><strong th:if="${issue.fine > 0}" style="color:#dc2626;" th:text="'₹' + ${issue.fine}"></strong><span th:unless="${issue.fine > 0}">₹0</span></td>
+          <td><span th:if="${issue.return_date != null}" class="badge badge-success">Returned</span><span th:if="${issue.return_date == null and issue.due_date < nowText}" class="badge badge-danger">Overdue</span><span th:if="${issue.return_date == null and issue.due_date >= nowText}" class="badge badge-warning">Active</span></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(issuedBooks)}"><td colspan="10"><div class="empty-state"><div class="empty-icon">📭</div><p>No records found for this filter.</p></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</html>
